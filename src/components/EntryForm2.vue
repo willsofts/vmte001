@@ -22,7 +22,7 @@
           </div>
         </div>
         <div class="row row-height">
-          <div class="col-height col-md-10">
+          <div class="col-height col-md-12">
             <label for="taskname">{{ labels.taskname_label }}</label>
             <div class="input-group has-validation" :class="{'has-error': v$.taskname.$error}">
               <input ref="taskname" type="text" v-model="localData.taskname" id="taskname" class="form-control input-md" maxlength="150" /> 
@@ -34,14 +34,14 @@
         <div class="row row-height">
           <div class="col-height col-md-7">
             <label>{{ labels.connectid_label }}</label>
-            <div class="input-group">
+            <div class="input-group" :class="{'has-error': v$.connectid.$error}">
               <select ref="connectid" v-model="localData.connectid" class="form-control input-md">
-                <option value=""></option>
                 <option v-for="(value,key) in dataCategory.tmigrateconnect" :key="key" :value="key">{{value}}</option>
               </select>
-              <a href="javascript:void(0)" id="connecteditbutton" @click="connectRetrieve" class="input-group-addon input-group-append input-group-text" title="Edit Connection" tabindex="-1"><em class="fa fa-edit" aria-hidden="true"></em></a>
-              <a href="javascript:void(0)" id="connectnewbutton" @click="connectInsert" class="input-group-addon input-group-append input-group-text" title="New Connection" tabindex="-1"><em class="fa fa-plus" aria-hidden="true"></em></a>
+              <a href="javascript:void(0)" id="connecteditbutton" class="input-group-addon input-group-append input-group-text" title="Edit Connection" tabindex="-1"><em class="fa fa-edit" aria-hidden="true"></em></a>
+              <a href="javascript:void(0)" id="connectnewbutton" class="input-group-addon input-group-append input-group-text" title="New Connection" tabindex="-1"><em class="fa fa-plus" aria-hidden="true"></em></a>
             </div>
+            <span v-if="v$.connectid.$error" class="has-error">{{ v$.connectid.$errors[0].$message }}</span>
           </div>
         </div>
         <div class="row row-height">
@@ -56,7 +56,7 @@
         <div class="row row-height">
           <div class="col-height col-md-12">
             <label>{{ labels.taskmodel_label }}</label>
-            <a href="javascript:void(0)" id="addmodelbutton" @click="addModelClick" class="btn btn-primary btn-md" title="Add Model" tabindex="-1"><i class="fa fa-plus fa-btn-icon" aria-hidden="true"></i></a>
+            <a href="javascript:void(0)" id="addmodelbutton" class="btn btn-primary btn-md" title="Add Model" tabindex="-1"><i class="fa fa-plus fa-btn-icon" aria-hidden="true"></i></a>
           </div>
         </div>
         <div id="fsmodeltablayer">
@@ -72,7 +72,7 @@
                   :aria-selected="index === 0 ? 'true' : 'false'"
                 >
                   <label>{{ item.modelname }}</label>
-                  <span v-if="!(index === 0)" :id="'dellink_' + item.modelid" class="del-linker" @click="deleteModelClick(item)">
+                  <span v-if="!(index === 0)" :id="'dellink_' + item.modelid" class="del-linker">
                     <i class="fa fa-times-circle"></i>
                   </span>
                 </a>
@@ -82,8 +82,31 @@
         </div>
         <div id="entrytabmodel" class="tab-content">
           <template v-for="(item,index) in localData.models" :key="item.modelid">
-            <div class="tab-pane fade entry-models" :class="{ 'active show': index === 0 }" :id="'entrymodel_'+item.modelid" :data-model="item.modelid" :data-index="index">
-              <ModelForm scope="entry" ref="modelForm" :labels="labels" :dataCategory="dataCategory" :dataModel="item" :index="index" />
+            <div class="tab-pane fade entry-models" :class="{ 'active show': index === 0 }" :id="'entrymodel_'+item.modelid" :data-model="item.modelid">
+              <div class="row row-height">
+                  <div class="col-height col-md-10">
+<label class="control-label">{{ labels.modelname_label }}</label>
+<input type="text" v-model="item.modelid" :id="'modelname_' + item.modelid" class="form-control input-md irequired alert-input model-name" maxlength="150" :data-model="item.modelid"/>
+                  </div>
+              </div>
+              <div class="row row-height">
+                <div class="col-height col-md-5">
+<label class="control-label">{{ labels.tablename_label }}</label>
+<input type="text" v-model="item.tablename" :id="'tablename_' + item.modelid" class="form-control input-md irequired alert-input table-name" maxlength="50" />
+                </div>
+              </div>
+              <div class="row row-height">
+                <div class="col-height col-md-12">
+<label class="control-label">{{ labels.tablefields_label }}</label>
+<textarea v-model="item.tablefields" :id="'tablefields_' + item.modelid" class="form-control input-md irequired alert-input table-fields validate-json" rows="15" />
+                </div>
+              </div>
+              <div class="row row-height">
+                <div class="col-height col-md-12">
+<label class="control-label">{{ labels.tablesettings_label }}</label>
+<textarea v-model="item.tablesettings" :id="'tablesettings_' + item.modelid" class="form-control input-md irequired alert-input table-settings validate-json" rows="5" />
+                </div>
+              </div>
             </div>
           </template>
         </div>
@@ -91,26 +114,19 @@
     <template v-slot:footer>
       <button ref="savebutton" id="savebutton" class="btn btn-dark btn-sm" @click="saveClick" v-if="insertMode"><em class="fa fa-save fa-btn-icon"></em>{{ labels.save_button }}</button>
       <button ref="updatebutton" id="updatebutton" class="btn btn-dark btn-sm" @click="updateClick" v-if="updateMode"><em class="fa fa-save fa-btn-icon"></em>{{ labels.update_button }}</button>
-      <button id="canceldialogbutton" class="btn btn-dark btn-sm" data-dismiss="modal"><em class="fa fa-close fa-btn-icon"></em>{{ labels.cancel_button }}</button>
+      <button class="btn btn-dark btn-sm" data-dismiss="modal"><em class="fa fa-close fa-btn-icon"></em>{{ labels.cancel_button }}</button>
     </template>
   </DialogForm>
-  <teleport to="#connectiondialog">
-    <ConnectionForm ref="connectionForm" :labels="labels" :dataCategory="dataCategory" @connect-saved="connectSaved" @connect-updated="connectUpdated" @connect-deleted="connectDeleted" />
-  </teleport>
 </template>
 <script>
-import { v4 as uuid } from 'uuid';
 import { ref, computed, watch } from 'vue';
 import { useVuelidate } from '@vuelidate/core';
 import { required, helpers } from '@vuelidate/validators';
 import $ from "jquery";
 import { DEFAULT_CONTENT_TYPE, getApiUrl, disableControls }  from '@willsofts/will-app';
 import { startWaiting, stopWaiting, submitFailure, detectErrorResponse }  from '@willsofts/will-app';
-import { confirmUpdate, confirmSave, confirmDelete, successbox, serializeParameters, confirmDialogBox } from '@willsofts/will-app';
-import { validJSON } from "../assets/js/app.libs.js";
+import { confirmUpdate, confirmSave, confirmDelete, successbox, serializeParameters } from '@willsofts/will-app';
 import DialogForm from './DialogForm.vue';
-import ModelForm from "./ModelForm";
-import ConnectionForm from "./ConnectionForm";
 
 const APP_URL = "/api/emte001";
 const defaultData = {
@@ -124,7 +140,7 @@ const defaultData = {
 
 export default {
   components: {
-    DialogForm, ModelForm, ConnectionForm
+    DialogForm
   },
   props: {
     modes: Object,
@@ -144,12 +160,11 @@ export default {
       return {
         taskid: { required: requiredMessage() },
         taskname: { required: requiredMessage() },
-        taskconfigs: { 
-          validConfigs: helpers.withMessage("Invalid JSON format setting", value => validJSON(value) )
-        },
+        connectid: { required: requiredMessage() },
+        taskconfigs: { required: requiredMessage() },
       } 
     });
-    const v$ = useVuelidate(validateRules, localData, { $lazy: true, $autoDirty: true, $scope: "entry" });
+    const v$ = useVuelidate(validateRules, localData, { $lazy: true, $autoDirty: true });
     return { mode, v$, localData, disabledKeyField, reqalert };
   },
   created() {
@@ -206,15 +221,10 @@ export default {
     },
     focusFirstError() {
       if(this.v$.$errors && this.v$.$errors.length > 0) {
-        let params = this.v$.$errors[0].$params;
         let input = this.v$.$errors[0].$property;
         let el = this.$refs[input];
         if(el) el.focus(); //if using ref
         else $("#"+input).trigger("focus"); //if using id
-        if(typeof params.index === 'number') {
-          $("#linker_"+params.modelid).trigger("click");
-          setTimeout(() => { $("#"+input+"_"+params.modelid).trigger("focus"); },100);
-        }
       }
     },
     showDialog(callback) {
@@ -236,8 +246,6 @@ export default {
     },
     startInsertRecord() {
       this.resetRecord();
-      this.localData.taskid = uuid();
-      this.addNewModel();
       this.showDialog(() => { this.$refs.taskname.focus(); });
     },
     startSaveRecord() {
@@ -363,53 +371,6 @@ export default {
           });
         }
       });	
-    },
-    addModelClick() {
-      this.addNewModel();
-    },
-    addNewModel() {
-      let model = {
-        modelid: uuid(),
-        modelname: "NewModel",
-        tablename: "",
-        tablefields: "",
-        tablesettings: ""
-      };
-      this.localData.models.push(model);
-    },
-    deleteModelClick(item) {
-      console.log("deleteModelClick: item",item);
-      this.confirmRemoveModel([item.modelname],() => {
-        const index = this.localData.models.findIndex(it => it.modelid === item.modelid);
-        if(index !== -1) {
-          this.localData.models.splice(index, 1);
-          $("a.model-link:first").trigger("click");
-        }
-      });
-    },
-    confirmRemoveModel(params, okFn, cancelFn) {
-      if(!confirmDialogBox("QS0306",params,"Do you want to delete this model?",okFn,cancelFn)) return false;
-      return true;
-    },
-    connectInsert() {
-      this.$refs.connectionForm.startInsertRecord();
-    },
-    connectRetrieve() {
-      if(this.localData.connectid && this.localData.connectid.trim().length > 0) {
-        this.$refs.connectionForm.retrieveRecord({connectid: this.localData.connectid});
-      }
-    },
-    connectSaved(data,response) {
-      console.log("Connection: record saved");
-      console.log("data",data,"response",response);
-    },
-    connectUpdated(data,response) {
-      console.log("Connection: record updated");
-      console.log("data",data,"response",response);
-    },
-    connectDeleted(data,response) {
-      console.log("Connection: record deleted");
-      console.log("data",data,"response",response);
     },
   }
 };
